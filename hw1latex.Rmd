@@ -1,0 +1,311 @@
+---
+title: "Homework"
+author: "Yuyu"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+  pdf_document:
+    latex_engine: xelatex
+---
+#Problem  1.2
+```{r pressure}
+library(alr4)
+data(wblake)
+attach(wblake)
+
+meanLength <- with(wblake, tapply(Length, Age, mean))
+
+#means
+meanLength
+
+# variances
+meanVar
+
+#average length versus Age
+plot(1:8,meanLength)
+
+#standard deviations versus age
+plot(1:8,meanSD)
+
+```
+meanVar <- with(wblake, tapply(Length, Age, var))
+meanSD<-meanVar^(1/2)
+In the graph of average length versus age, we see a clear increasing trend as age increase.
+The standard deviations versus age is not a null plot. The standard deviation is around 30 except for some age groups, for example,age group 3  and 8. The spike at age group 8 can be explained as it has few data points. However, the curve at age group 7 may indicates that we don't have a constant conditional variance.
+
+#Problem  1.4
+```{r}
+attach(oldfaith)
+plot(Interval~Duration,data=oldfaith)
+m<-lm(Interval~Duration)
+abline(m)
+summary(m)
+```
+From above output, we are confident to say that there is a positive realtionship between interval and duration.
+
+
+#Problem  2.2
+```{r}
+data(UBSprices)
+attach(UBSprices)
+plot(rice2009~rice2003,data=UBSprices)
+fit1<-lm(rice2009~rice2003)
+abline(fit1,lty="dashed")
+summary(fit1)
+```
+
+#2.2.1
+  Points above this line means country which has a higher rice price in 2009 than in 2003
+  Points below this line means country which has a lower rice price in 2009 than in 2003
+# 2.2.2
+  Vilnius had the largest increase in rice price
+  Mumbaio had the largest decrease in rice price
+# 2.2.3
+  It doesn't necessarily means prices are lower in 2009 than in 2003
+  For those countries which has a lower rice price than about 25 in 2003,prices are higher in 2009 than in 2003.
+  But for thoes countries which has a higher rice price than 25 in 2003,prices are lower in 2009 than in 2003.
+  
+  
+# 2.2.4
+  Why fitting simple linear regression to the figure in this problem is not likely to be appropriate?
+  1) the prediction is not precise, there are lots of outliers which suggests that some countries' rice price in 2009 are deviataed from prediction
+  2)  it looks like the spread of 2009 rice price increased as the 2003 rice increase, which may suggests that it doesn't have a constant conditional variance
+  3) the linear trend disappear as the 2003 rice price increase.
+  4) the residual plot is not randomly scattered and there are lots of scatterd plots
+  5) the R squared is only 0.2474, which means lots of 2009 rice price is not explained.
+ 
+
+  
+# problem 2.3
+```{r}
+plot(rice2009~rice2003,data=UBSprices)
+fit2<-lm(log(rice2009)~rice2003)
+```
+
+# 2.3.1 why log-scale is preferable?
+  1) the plots are better preidicted
+  2) the variance is more constant 
+  3) the residuals are more randomly scatted 
+  4) the linear trend is clear after log-scaled
+  
+# 2.3.2 interpretation   
+   For every one unit increase in log(X), it is associated with a change in log(y) of β1. When β1>0, the expectation grow quickly. When β1 < 0, the expectation grow slowly. When β1 = 0, the expectation grow linearly.
+   
+   β0 is a constant or Intercept of the slope, which indicates a value when β1 is 0.
+   
+
+# problem 2.6
+```{r}
+data(ftcollinstemp)
+attach(ftcollinstemp)
+head(ftcollinstemp)
+plot(winter~fall,data=ftcollinstemp)
+```
+ #2.6.1
+  The scatterplot has no clear pattern. As the temperature increase, the variance seems to increase. When the fall temperature is higher, the average of winter temperature is genrally higher
+  
+  
+ #2.6.2
+```{r}
+plot(winter~fall,data=ftcollinstemp)
+fit3<-lm(winter~fall)
+abline(fit3)
+summary(fit3)
+```
+# 2.6.2  
+  NUll hypothsis: slope is 0   Alternative hypothsis: slope is not equal to 0
+  As t value is as small as 2.049, and p value is 0.0428, so at significance level of α = 0.05, we reject the null hypothesis.
+  
+# 2.6.3  the value of the variability in winter explained by fall and explain what this means?
+  The R^2= 0.0371, which means only about 3.71% of variability in winter can be explained by fall. It seems that linear regression model may not be a good model to explain the relationship of fall and winter temperature.
+   
+#2.6.4
+```{r}
+ftcollinstemp1<-subset(ftcollinstemp,year%in%c(1900:1989))
+ftcollinstemp2<-subset(ftcollinstemp,year%in%c(1990:2010))
+plot(winter~fall,data=ftcollinstemp1)
+fit4<-lm(winter~fall,data=ftcollinstemp1)
+abline(fit4)
+summary(fit4)
+plot(winter~fall,data=ftcollinstemp2)
+fit5<-lm(winter~fall,data=ftcollinstemp2)
+abline(fit5)
+summary(fit5)
+```
+ The results are not different in two time periods.   
+  1) Both two correaltions are not significant.
+  2) The R^2 are small in both outputs that less than 1% of the variability in the observed values of winter is explained.
+  3) The linear regression models may not be a good fit for both time periods.
+
+# 2.8 
+# 2.8.1
+α is the average of all $yi$, a.k.a $\bar y$ Another interpretation is that $α=E[Y|X= \bar x]$
+
+# 2.8.2
+ $$
+ \partial Q/\partial \hat α= 
+ \sum_{i=1}^n
+(y_{i}-\hat α-\hat β_{1}(x_{i}-\bar x)) = 0  \\
+ \sum_{i=1}^n y_{i} - 
+ \sum_{i=1}^n\hat α -\hat β_{1}\sum_{i=1}^n(x_{i}-\bar x) =0 \\
+ n\hat α = \sum_{i=1}^n y_{i}  -\hat β_{1}\sum_{i=1}^n(x_{i}-\bar x)\\
+ \hat α= \bar y \\ since \sum_{i=1}^n(x_{i}-\bar x)=0
+ $$
+$β_{1}$did not change throughout the remodeling. Therefore, $\hat β_{1} =\frac{Sxy}{Sxx}$ remains the same. 
+
+# 2.8.3
+
+$$V(\hat α) =V(\bar y) =V(\frac{1}{n}\sum_{i=1}^n y) =\frac{σ^2}{n} \\
+V(\hatβ_{1}) =\frac{σ^2}{Sxx} \\
+Cov(\hat α,\hatβ_{1})= Cov(\bar y,\frac{Sxy}{Sxx})= Cov( \frac{1}{n} \sum_{i=1}^n y_{i},\sum_{i=1}^n c_{i}y_{i})=\frac{1}{n}\sum_{i=1}^n c_{i}Var(y_{i}) = 0
+$$  
+
+# 2.9
+# 2.9.1
+$$
+E(Y |Z = z) \\= γ_0 + γ_1z \\= γ_0 + γ_1(ax + b)\\ =γ_0 + γ_1ax + γ_1b\\ = (γ_0 + γ_1b) + (γ_1a)x \\ = E(Y |X = x)\\ = β_{0} + β_1x\\
+$$
+Thus
+$$
+β_0 = γ_0 + γ_1b\\
+β_1 = γ_1a
+$$
+And
+$$
+γ_1 = β_1/a\\
+γ_0 = β_0-β_1b/a
+$$
+$$RSS_I =\sum_{i=1}^n( y_{i}- (β_0 + β_1x_i))^2\\
+RSS_{II}=\sum_{i=1}^n( y_{i}- (γ_0 + γ_1z_i))^2   \\
+=\sum_{i=1}^n( y_{i}- (γ_0 + γ_1(ax_i+b)))^2\\
+=\sum_{i=1}^n( y_{i}-(β_0 - β_1b/a + (β_1/a)(ax_i + b)))^2\\
+=\sum_{i=1}^n( y_{i}- (β_0 + β_1x_i))^2\\
+= RSS_I$$
+So, the estimates of variance in the 2 regressions are equal.
+t-Values of tests of $β_1 = 0$ and $γ_1 = 0$ are
+
+$$t_{β1} = \frac{β_1}{\sqrt{Var(β_1)} } \\
+t_{γ_1} = \frac{γ_1}{\sqrt{Var(γ_1)}} \\
+       = \frac{\frac{β_1}{a}}{\sqrt{Var(γ_1)}/a} \\
+       = \frac{β_1}{\sqrt{Var(β_1)}}\\
+       =t_{β1}
+$$
+# 2.9.2
+$$
+  dE(Y |X = x) \\= d(β_0+β_1x)\\=dβ_0+dβ_1x\\ =E(dY |X = x) \\ =E(V |X = x) \\=σ_0+σ_1x
+$$
+so
+$$
+  σ_0=dβ_0\\
+  σ_1=dβ_1
+$$
+$$
+RSS_I =\sum_{i=1}^n( y_{i}- (β_0 + β_1x_i))^2\\
+RSS_{III}=\sum_{i=1}^n( v_{i}- (σ_0 + σ_1z_i))^2   \\
+=\sum_{i=1}^n( dy_{i}- (dβ_0 + dβ_1x_i))^2\\
+=d^2\sum_{i=1}^n( y_{i}- (β_0 + β_1x_i))^2\\
+= d^2RSS_I
+$$
+So, the estimates of variance in the 2 regressions are equal.
+t-Values of tests of $β_1 = 0$ and $σ_1 = 0$ are
+
+
+$$
+t_{β1} = \frac{β_1}{\sqrt{Var(β_1)} } \\
+t_{γ_1} = \frac{σ_1}{\sqrt{Var(σ_1)}} \\
+       = \frac{dβ_1}{d\sqrt{Var(β_1)}} \\
+       = \frac{β_1}{\sqrt{Var(β_1)}}\\
+       =t_{β1}
+$$
+# 2.13 
+# 2.13.1
+```{r}
+data(Heights)
+attach(Heights)
+fit6<- lm(dheight~mheight)
+summary(fit6)
+```
+(1)
+the estimate of Intercept is 29.91744, and the estimate of dheight is 0.54175,
+the standard error of Intercept is 1.62247, and the standard error of Intercept is 0.02596
+the value of the coefficient of determination is 0.2408, and the estimate of variance is 5.1361671
+(2)
+As the p-value is <2e-16, we are confident to say that daughter's height is related to mother's height
+Multiple R-squared is 0.2408, which means only 24.08% variability of the daughter's height is explained by mother's height
+Linear regression may not be a good fit.
+
+
+# 2.13.2
+```{r}
+confint(fit6,"mheight",level=0.99)
+predict(fit6,newdata=data.frame(mheight = 64),interval="prediction",level=0.99) #0.99?
+```
+
+# caculation
+
+```{r}
+confint_beta1 <- c(0.54175-0.02596*2.32635,0.54175+0.02596*2.32635)
+confint_beta1
+
+confint_64<-c(64*0.54175+29.91744-2.266*2.32635,64*0.54175+29.91744+2.266*2.32635)
+confint_64
+```
+
+
+# 2.21 
+```{r}
+data(wm1)
+attach(wm1)
+plot(CSpd~RSpd)
+fit7<- lm(CSpd~RSpd)
+abline(fit7)
+```
+# 2.21.1
+From the scatterplot above, RSpd and Cspd seems to be correlated. 
+Linear regression model looks like a good fit for the model.
+
+# 2.21.2
+```{r}
+summary(fit7)
+```
+As the p-value is <2e-16, we are confident to say that Cspd is related to Rspd
+Multiple R-squared is 0.5709, which means only 57.09% variability of Cspd is explained by Rspd
+
+# 2.21.3
+```{r}
+predict(fit7,newdata=data.frame(RSpd = 7.4285),interval="prediction",level=0.95) 
+```
+ 
+# 2.21.5
+```{r}
+y1<- summary(fit7)$coefficients[1] + summary(fit7)$coefficients[2] * 7.4285
+se1 <- sqrt(sigma(fit7)^2/62039 + sigma(fit7)^2*((1/1116) +
+(7.4285-mean(wm1$RSpd))^2/(var(wm1$RSpd)*(length(wm1$RSpd)-1))))
+c<-c(y1 - 1.96*se1, y1 + 1.96*se1)
+c
+
+```
+
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   

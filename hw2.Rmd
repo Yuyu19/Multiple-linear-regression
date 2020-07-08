@@ -1,0 +1,196 @@
+---
+title: "HW2"
+author: "Yuyu"
+date: "2020.1.31"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+
+#Problem 3.2
+```{r }
+library(alr4)
+data("UN11")
+attach(UN11)
+
+#3.2.1
+pairs(~fertility+ log(ppgdp)+pctUrban,labels=c("fertility", "log(ppgdp)", "pctUrban"))
+```
+#3.2.2
+```{r}
+fit1<-lm(fertility ~log(ppgdp) )
+fit2<-lm(fertility~ pctUrban)
+summary(fit1)
+summary(fit2)
+```
+As p-values are as small as <2e-16, the slope coefficients are significantly different from 0.
+
+#3.2.3
+```{r}
+fit3<-lm(fertility~log(ppgdp)+pctUrban )
+
+fit4<-lm(log(ppgdp)~pctUrban)
+fit5<-lm(pctUrban~log(ppgdp))
+
+
+fit6<-lm(fit2$residuals~fit4$residuals)
+plot(fit2$residuals~fit4$residuals)
+abline(fit6)
+
+fit7<-lm(fit1$residuals~fit5$residuals)
+plot(fit1$residuals~fit5$residuals)
+abline(fit7)
+```
+Based on the added-variable plots,  log(ppgdp) is useful after adjusting for pctUrban because there is a declining trend in the plots.
+PctUrban is not useful after adjusting for log(ppgdp), because the plots are showing a random pattern.
+
+E(fertility|log(ppgdp),pctUrban)= 7.9932699 -0.6151425*log(ppgdp) - 0.0004393*pctUrban
+The coefficient for log(ppgdp) is about -0.6151425, so it's meaningful in decrasing the fertility rate. 
+However, the coefficient for pctUrban is only -0.0004393, which is approximately 0 and negligible in affecting the fertility rate.
+
+
+#3.2.4
+```{r}
+summary(fit3)
+summary(fit6)
+```
+
+The estimated coefficient for log(ppgdp) is  -0.6151425
+The estimated slope in the added-variable plot for log(ppgdp) after pctUrban is -6.151e-01
+They are approxiamtely the same.This correctly suggests that all the estimates in a multiple linear regression model are adjusted for all the other regressors in the mean function.
+
+
+#3.2.5
+```{r}
+qqplot(fit3$residuals ,fit6$residuals )
+qqplot(fit3$residuals ,fit7$residuals )
+```
+So, the residuals in the added-variable plot are identical to the residuals from the mean function with both predictors.
+
+#3.2.6
+```{r}
+summary(fit6)$coefficients[2,c(3,4)]
+summary(fit3)$coefficients[2,c(3,4)]
+```
+The t-test for the coefficient for log(ppgdp) is not quite the same from the added-variable plot and from the regression with
+both regressors. This is because they have different degree of freedoms.
+
+
+#Problem 3.3
+#3.3.1
+```{r}
+data(BGSgirls)
+attach(BGSgirls)
+pairs(~HT2+ HT9+ WT2+ WT9+ST9+ BMI18,labels=c("HT2", "HT9", "WT2", "WT9","ST9", "BMI18"))
+```
+
+It looks like all the data are positively correlated.
+There are some outliers in BMI 18. BMI 18 has weak correlation with all other variables.
+```{r}
+cor(cbind(HT2, HT9, WT2, WT9,ST9, BMI18))
+```
+The information in the sample correlation matrix is consistent with it of scatter matrix.
+All the data are positively correlated. But BMI has a much weaker correlation with other variables.
+
+# 3.3.2
+```{r}
+fit6<- lm(BMI18~WT9)
+fit7<- lm(BMI18~ST9)
+fit8<-lm(ST9~WT9)
+fit9<- lm(fit6$residuals~fit8$residuals)
+
+## marginal plots of BMI18 vs. WT9
+plot(BMI18~WT9)
+abline(fit6)
+
+## marginal plots of BMI18 vs. ST9
+plot(BMI18~ST9)
+abline(fit7)
+
+## marginal plots of WT9 vs. ST9
+plot(ST9~WT9)
+abline(fit8)
+
+
+## the added-variable plots for ST9.
+plot(fit6$residuals~fit8$residuals)
+abline(fit9)
+```
+The marginal plots show that BMI18 is positively correlated to WT9, but unrelated with ST9. Besides, ST9 is positively related with WT9.
+However, the added-variable plot shows that BMI18 is negatively correlated with ST9 after adjusting for WT9 because there is a declining trend. 
+# 3.3.3
+```{r}
+fit10<-lm(BMI18~HT2+HT9+ WT2+ WT9+ST9)
+summary(fit10)
+# t-statistics
+summary(fit10)$coefficients[,c(3,4)]
+```
+¦Ò is 2.14 and R-squared is 0.4431. 
+Hypothesis: NH:  ¦Â1=0,¦Â1,¦Â2,¦Â3,¦Â4 arbitrary
+            AH:  ¦Â1¡Ù0,¦Â1,¦Â2,¦Â3,¦Â4 arbitrary
+Based on t-statistics and p-value, 
+  Intercept, WT9 and ST9 have a p-value smaller than 0.01,
+  suggesting there are different from 0 at significant level 0f 0.01.
+
+#Problem 4.1
+```{r}
+BGSgirls$DW9<-with(BGSgirls,WT9-WT2)
+BGSgirls$DW18<-with(BGSgirls,WT18-WT9)
+BGSgirls$avg<-with(BGSgirls,(WT2+WT9+WT18)/3)
+BGSgirls$lin<-with(BGSgirls,WT18-WT2)
+BGSgirls$quad<-with(BGSgirls,WT2-2*WT9+WT18)
+```
+ 
+
+```{r}
+fit11<-lm(BMI18~WT2+WT9+WT18,BGSgirls)
+fit12<-lm(BMI18~WT2+DW9+DW18,BGSgirls)
+fit13<-lm(BMI18~WT2+WT9+WT18+DW9+DW18,BGSgirls)
+fit14<-lm(BMI18~avg+lin+quad,BGSgirls)
+summary(fit11)
+summary(fit12)
+summary(fit13)
+summary(fit14)
+```
+Compared with the 3 models in section 4.1, the estimated intercept, residual standard error,Multiple R-squared, Adjusted R-squared, and F-statistic stay the same in the new model.
+```{r}
+qqplot(fit11$residuals,fit14$residuals)
+qqplot(fit12$residuals,fit14$residuals)
+qqplot(fit13$residuals,fit14$residuals)
+```
+
+The residuals of four models are also the same.That's because these four models of linear regression all have same regressors, WT2,  WT9, WT18 and their transformations, and there exists correlationship among the coefficients.
+
+
+
+
+
+#Problem 7.2
+```{r}
+data("physics1")
+attach(physics1)
+head(physics1)
+fit15<- lm(y ~ x, data=physics, weights=1/SD^2) 
+fit16<-lm(y~x+I(x^2),data=physics1,weights = 1/SD^2)
+plot(x,y)
+abline(fit15)
+lines(x,fit16$fit,lty="dashed")
+
+```
+Both models cannot fit the data very well, it looks like quadratic models fit slightly better.
+
+```{r}
+summary(fit15)
+summary(fit16)
+anova(fit15,fit16)
+
+```
+
+From the summary result, the coefficients of the regressors in model 2 is not significant.
+However, from the anova test for comparing the two models, has p-value smaller than 0.05, suggesting the alternative model with the quadratic term provides a superior fit.
+
+
+
+
+

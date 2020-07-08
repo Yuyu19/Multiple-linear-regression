@@ -1,0 +1,130 @@
+---
+title: "HW4-9"
+author: "Yuyu Fan"
+date: "March 31, 2020"
+output:
+  word_document: default
+  html_document: default
+---
+```{r}
+
+library(alr4)
+library(car)
+```
+## Problem 10.4
+```{r}
+head(BGSboys)
+attach(BGSboys)
+```
+In the first step, plot the scatterplot matrix. It looks like all the variables are positively correlated.
+I also noticed that there is potential outrliers in WT9,LG9 and ST9.
+```{r}
+pairs(~WT2+HT2+WT9 +HT9 +LG9+ST9+ HT18,BGSboys)
+```
+Next step, I draw the scatterplot and find that there is an outlier 60 which may greatly influence my analysis. SO I delete it from my dataset.
+
+Then I transform both predictor and response with PowerTransformations.
+Based on the LR test result, I choose lambda = (1 1 0 0 -1 1 1)
+```{r}
+summary(b1 <- powerTransform(cbind(HT18,HT2, WT2, HT9, WT9, LG9, ST9) ~ 1,data=BGSboys, subset=-60))
+```
+
+So I transformed the response and predictor variable with selected lambda value and fit the model.
+```{r}
+m1<-lm(HT18 ~ HT2 + log(WT2) + HT9 +I(WT9^-1) + log(LG9) + ST9,data = BGSboys,subset=-60)
+invResPlot(m1)
+```
+In the next step, I conducted Backward-Stepwise Elimination and variable selection based on information criteria and minimizing AIC.
+```{r}
+step(m1,lower=~1,data=BGSboys,subset=-60)
+```
+Using an information criterion, I dropped some regressors WT9 and ST9 and refit the model m2.
+```{r}
+m2<-lm(HT18 ~ HT2 + log(WT2) + HT9 + log(LG9), data = BGSboys,subset = c(-60)
+    )
+```
+So I conduct diagnostic analysis and checked diagnostic plots to see is there any outlier.
+```{r}
+influenceIndexPlot(m2)
+```
+Cook's distance locates a possible cause D34,which is much larger than all the other values of Cook's distance, suggesting this case may have large enough incluence.
+The value of h34 is also large.
+Furthermore, I checked added-variable plots to disgnostic the incluence. The point of 31 and 57 are clearly separated from the others, and is likely influential point based on these graphs.
+```{r}
+avPlots(m2)
+```
+
+So I delete these points 31,34,and 57, and refit my model.
+```{r}
+m3<-lm(HT18 ~ HT2 + log(WT2) + HT9  + log(LG9) , data = BGSboys,subset = c(-31,-34,-57,-60)
+    )
+summary(m3)
+plot(m3)
+
+```
+
+The residuals look randomly scattered. 
+From the normal Q-Q plot, all the points looks like lined up. 
+All the residuals are within cook's distance.
+So I believe my model is a good fit. 
+
+
+
+
+lambda = (1 1 0 0 -1 1 1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
