@@ -126,9 +126,9 @@ summary(fit10)
 # t-statistics
 summary(fit10)$coefficients[,c(3,4)]
 ```
-¦Ò is 2.14 and R-squared is 0.4431. 
-Hypothesis: NH:  ¦Â1=0,¦Â1,¦Â2,¦Â3,¦Â4 arbitrary
-            AH:  ¦Â1¡Ù0,¦Â1,¦Â2,¦Â3,¦Â4 arbitrary
+Â¦Ã’ is 2.14 and R-squared is 0.4431. 
+Hypothesis: NH:  Â¦Ã‚1=0,Â¦Ã‚1,Â¦Ã‚2,Â¦Ã‚3,Â¦Ã‚4 arbitrary
+            AH:  Â¦Ã‚1Â¡Ã™0,Â¦Ã‚1,Â¦Ã‚2,Â¦Ã‚3,Â¦Ã‚4 arbitrary
 Based on t-statistics and p-value, 
   Intercept, WT9 and ST9 have a p-value smaller than 0.01,
   suggesting there are different from 0 at significant level 0f 0.01.
